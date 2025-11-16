@@ -66,11 +66,11 @@ export class Scheduler {
     // Refresh token list every 5 minutes
     setInterval(this.refreshTokenList, 5 * 60 * 1000);
 
-    // Pre-warm high-volume tokens every 2 minutes
-    setInterval(this.preWarmTopTokens, 2 * 60 * 1000);
+    // Pre-warm high-volume tokens every 30 seconds (more frequent for demo)
+    setInterval(this.preWarmTopTokens, 30 * 1000);
 
-    // Update live price cache every 15 seconds
-    setInterval(this.autoUpdateRedis, 15 * 1000);
+    // Update live price cache every 5 seconds (very frequent for demo)
+    setInterval(this.autoUpdateRedis, 5 * 1000);
 
     // Run once at start
     this.refreshTokenList();
