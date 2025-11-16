@@ -1,0 +1,217 @@
+{
+  "info": {
+    "name": "Meme Aggregator API",
+    "description": "API collection for testing the Meme Coin Aggregator service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        },
+        "description": "Check if the API server is running"
+      }
+    },
+    {
+      "name": "Get Single Token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/token/:address",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "token", ":address"],
+          "variable": [
+            {
+              "key": "address",
+              "value": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "description": "Solana token address (USDC example)"
+            }
+          ]
+        },
+        "description": "Fetch detailed data for a single token by address"
+      }
+    },
+    {
+      "name": "Get Token List - Default",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"]
+        },
+        "description": "Get paginated list of tokens with default settings (20 tokens, sorted by volume)"
+      }
+    },
+    {
+      "name": "Get Token List - Sorted by Volume",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=30&sortBy=volume24hUsd",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "30"
+            },
+            {
+              "key": "sortBy",
+              "value": "volume24hUsd"
+            }
+          ]
+        },
+        "description": "Get tokens sorted by 24h volume"
+      }
+    },
+    {
+      "name": "Get Token List - Sorted by Price Change 24h",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=20&sortBy=priceChange24h",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20"
+            },
+            {
+              "key": "sortBy",
+              "value": "priceChange24h"
+            }
+          ]
+        },
+        "description": "Get tokens sorted by 24h price change"
+      }
+    },
+    {
+      "name": "Get Token List - Sorted by Market Cap",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=20&sortBy=marketCapUsd",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20"
+            },
+            {
+              "key": "sortBy",
+              "value": "marketCapUsd"
+            }
+          ]
+        },
+        "description": "Get tokens sorted by market cap"
+      }
+    },
+    {
+      "name": "Get Token List - With Min Volume Filter",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=20&minVolume=10000",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20"
+            },
+            {
+              "key": "minVolume",
+              "value": "10000",
+              "description": "Minimum 24h volume in USD"
+            }
+          ]
+        },
+        "description": "Get tokens with minimum 24h volume of $10,000"
+      }
+    },
+    {
+      "name": "Get Token List - With Pagination",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens?limit=10&cursor={{nextCursor}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "cursor",
+              "value": "{{nextCursor}}",
+              "description": "Use nextCursor from previous response"
+            }
+          ]
+        },
+        "description": "Get next page of tokens using cursor"
+      }
+    },
+    {
+      "name": "Search Tokens",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tokens/search?q=SOL",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tokens", "search"],
+          "query": [
+            {
+              "key": "q",
+              "value": "SOL",
+              "description": "Search query (token name or address)"
+            }
+          ]
+        },
+        "description": "Search for tokens by name or address"
+      }
+    },
+    {
+      "name": "Get Token - Not Found",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/token/invalidaddress123",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "token", "invalidaddress123"]
+        },
+        "description": "Test error handling for invalid token address"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000",
+      "type": "string"
+    },
+    {
+      "key": "nextCursor",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
