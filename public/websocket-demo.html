@@ -511,8 +511,12 @@
         // Auto-load initial tokens on page load
         window.addEventListener('load', () => {
             const url = document.getElementById('serverUrl').value.trim();
-            if (url) {
-                fetchInitialTokens();
+            console.log('🔧 Page loaded. URL:', url);
+            if (url && url !== 'http://localhost:4000') {
+                console.log('🔧 Auto-fetching initial tokens...');
+                setTimeout(() => {
+                    fetchInitialTokens();
+                }, 1000); // Wait 1 second for page to fully load
             }
         });
     </script>

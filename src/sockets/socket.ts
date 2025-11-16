@@ -80,17 +80,15 @@ async function startRedisWatcher() {
         continue;
       }
 
-      // Significant price or volume change?
-      const priceChanged =
-        Math.abs((payload.priceUsd || 0) - (prev.priceUsd || 0)) > 0.000001;
+      // For demo purposes, broadcast if ANY field changed (more sensitive)
+      const priceChanged = payload.priceUsd !== prev.priceUsd;
+      const volumeChanged = payload.volume24hUsd !== prev.volume24hUsd;
+      const liquidityChanged = payload.liquidityUsd !== prev.liquidityUsd;
 
-      const volumeChanged =
-        Math.abs((payload.volume24hUsd || 0) - (prev.volume24hUsd || 0)) > 5;
-
-      if (priceChanged || volumeChanged) {
+      if (priceChanged || volumeChanged || liquidityChanged) {
         lastValues[tokenAddress] = payload;
         broadcastUpdate(payload);
-        console.log(`📊 Broadcasting update: ${tokenAddress.slice(0, 8)}...`);
+        console.log(`📊 Broadcasting update: ${tokenAddress.slice(0, 8)}... (P:${priceChanged} V:${volumeChanged} L:${liquidityChanged})`);
       }
     }
   }, 2000); // every 2 seconds
