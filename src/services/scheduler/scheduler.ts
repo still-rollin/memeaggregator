@@ -31,7 +31,8 @@ export class Scheduler {
       const topPairs = await fetchTopDexPairs();
       for (const pair of topPairs) {
         const redisKey = `token:${pair.baseToken.address}`;
-        await redis.set(redisKey, JSON.stringify(pair));
+        // Set with 30 second TTL to match aggregator caching
+        await redis.setex(redisKey, 30, JSON.stringify(pair));
       }
 
       console.log(`🔥 Pre-warm complete: ${topPairs.length} tokens cached`);
@@ -44,28 +45,16 @@ export class Scheduler {
     try {
       console.log("⚙️ Updating Redis with latest prices...");
 
-      const raw = await redis.get("token:list");
-      if (!raw) return;
+      // Refresh top tokens to trigger WebSocket updates
+      const topPairs = await fetchTopDexPairs();
 
-      const list = JSON.parse(raw);
-
-      for (const t of list.slice(0, 30)) {
-        const mint = t?.baseToken?.address;
+      for (const pair of topPairs.slice(0, 30)) {
+        const mint = pair?.baseToken?.address;
         if (!mint) continue;
 
-        const jPrice = await fetchJupiterPrice(mint);
-        const gPrice = await fetchGeckoPrice(mint);
-
-        const redisKey = `live:${mint}`;
-        await redis.set(
-          redisKey,
-          JSON.stringify({
-            mint,
-            jPrice,
-            gPrice,
-            time: Date.now(),
-          })
-        );
+        // Update the token cache (this will trigger WebSocket watcher)
+        const redisKey = `token:${mint}`;
+        await redis.setex(redisKey, 30, JSON.stringify(pair));
       }
 
       console.log("🟢 Live prices updated.");

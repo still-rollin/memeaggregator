@@ -309,16 +309,6 @@
             </div>
         </div>
 
-        <div class="instructions">
-            <h3>📋 How to Use This Demo:</h3>
-            <ol>
-                <li>Enter your server URL (local or deployed)</li>
-                <li>Click "Connect" to establish WebSocket connection</li>
-                <li>Open this page in <strong>multiple browser tabs</strong> to see synchronized updates</li>
-                <li>Watch real-time price and volume changes appear automatically</li>
-                <li>For video demo: Make rapid API calls in another tab/Postman to trigger updates</li>
-            </ol>
-        </div>
     </div>
 
     <script>
@@ -333,6 +323,11 @@
             if (!url) {
                 alert('Please enter a server URL');
                 return;
+            }
+
+            // Fetch initial tokens if not already loaded
+            if (updateCount === 0) {
+                fetchInitialTokens();
             }
 
             if (socket) {
@@ -476,10 +471,43 @@
             return (num / 1000000).toFixed(2) + 'M';
         }
 
-        // Auto-connect to localhost on page load (for development)
+        // Fetch initial tokens on page load
+        async function fetchInitialTokens() {
+            const url = document.getElementById('serverUrl').value.trim();
+            if (!url) return;
+
+            try {
+                const response = await fetch(`${url}/api/tokens?limit=30`);
+                const data = await response.json();
+
+                if (data.data && data.data.length > 0) {
+                    data.data.forEach(token => {
+                        displayUpdate({
+                            tokenAddress: token.tokenAddress,
+                            priceUsd: token.priceUsd,
+                            volume24hUsd: token.volume24hUsd,
+                            liquidityUsd: token.liquidityUsd,
+                            updatedAt: Date.now()
+                        });
+                        uniqueTokensSet.add(token.tokenAddress);
+                    });
+
+                    updateCount = data.data.length;
+                    document.getElementById('updateCount').textContent = updateCount;
+                    document.getElementById('uniqueTokens').textContent = uniqueTokensSet.size;
+                    console.log(`✅ Loaded ${data.data.length} initial tokens`);
+                }
+            } catch (err) {
+                console.error('Failed to fetch initial tokens:', err);
+            }
+        }
+
+        // Auto-load initial tokens on page load
         window.addEventListener('load', () => {
-            // Uncomment the line below to auto-connect on page load
-            // connect();
+            const url = document.getElementById('serverUrl').value.trim();
+            if (url) {
+                fetchInitialTokens();
+            }
         });
     </script>
 </body>
