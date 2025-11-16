@@ -11,11 +11,8 @@ export class Scheduler {
     try {
       console.log("🔄 Refreshing token list...");
 
-      const response = await axios.get(
-        "https://api.dexscreener.com/latest/dex/tokens/solana"
-      );
-
-      const tokens = response.data.pairs ?? [];
+      // Use the working fetchTopDexPairs function
+      const tokens = await fetchTopDexPairs();
       await redis.set("token:list", JSON.stringify(tokens));
 
       console.log(`✅ Token list refreshed: ${tokens.length} tokens`);
