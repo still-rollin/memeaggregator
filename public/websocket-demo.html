@@ -482,14 +482,20 @@
 
                 if (data.data && data.data.length > 0) {
                     data.data.forEach(token => {
+                        // Transform API format to display format
+                        const tokenAddress = token.baseToken?.address || token.tokenAddress || 'unknown';
+                        const priceUsd = parseFloat(token.priceUsd) || 0;
+                        const volume24hUsd = token.volume?.h24 || token.volume24hUsd || 0;
+                        const liquidityUsd = token.liquidity?.usd || token.liquidityUsd || 0;
+
                         displayUpdate({
-                            tokenAddress: token.tokenAddress,
-                            priceUsd: token.priceUsd,
-                            volume24hUsd: token.volume24hUsd,
-                            liquidityUsd: token.liquidityUsd,
+                            tokenAddress: tokenAddress,
+                            priceUsd: priceUsd,
+                            volume24hUsd: volume24hUsd,
+                            liquidityUsd: liquidityUsd,
                             updatedAt: Date.now()
                         });
-                        uniqueTokensSet.add(token.tokenAddress);
+                        uniqueTokensSet.add(tokenAddress);
                     });
 
                     updateCount = data.data.length;
