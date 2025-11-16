@@ -48,25 +48,35 @@ async function startRedisWatcher() {
     const keys = await redis.keys("token:*");
 
     for (const key of keys) {
+      // Skip the token:list key
+      if (key === "token:list") continue;
+
       const raw = await redis.get(key);
       if (!raw) continue;
 
       const token = JSON.parse(raw);
 
+      // Handle both DexScreener format and normalized format
+      const tokenAddress = token.baseToken?.address || token.tokenAddress || key.replace("token:", "");
+      const priceUsd = parseFloat(token.priceUsd) || 0;
+      const volume24hUsd = token.volume?.h24 || token.volume24hUsd || 0;
+      const liquidityUsd = token.liquidity?.usd || token.liquidityUsd || 0;
+
       const payload: LiveUpdate = {
-        tokenAddress: token.tokenAddress,
-        priceUsd: token.priceUsd,
-        volume24hUsd: token.volume24hUsd,
-        liquidityUsd: token.liquidityUsd,
+        tokenAddress: tokenAddress,
+        priceUsd: priceUsd,
+        volume24hUsd: volume24hUsd,
+        liquidityUsd: liquidityUsd,
         updatedAt: Date.now(),
       };
 
-      const prev = lastValues[token.tokenAddress];
+      const prev = lastValues[tokenAddress];
 
       if (!prev) {
         // First time seeing this token → store and broadcast
-        lastValues[token.tokenAddress] = payload;
+        lastValues[tokenAddress] = payload;
         broadcastUpdate(payload);
+        console.log(`📊 Broadcasting new token: ${tokenAddress.slice(0, 8)}...`);
         continue;
       }
 
@@ -78,16 +88,15 @@ async function startRedisWatcher() {
         Math.abs((payload.volume24hUsd || 0) - (prev.volume24hUsd || 0)) > 5;
 
       if (priceChanged || volumeChanged) {
-        lastValues[token.tokenAddress] = payload;
+        lastValues[tokenAddress] = payload;
         broadcastUpdate(payload);
+        console.log(`📊 Broadcasting update: ${tokenAddress.slice(0, 8)}...`);
       }
     }
   }, 2000); // every 2 seconds
 }
 
-/* --------------------------------------------------
-   BROADCAST TO ALL CONNECTED CLIENTS
---------------------------------------------------- */
+
 function broadcastUpdate(update: LiveUpdate) {
   if (!io) return;
   io.emit("token_update", update);
