@@ -22,6 +22,23 @@ app.use(express.json());
 // Routes
 app.use("/api", tokenRoutes);
 
+// Root route - Welcome message
+app.get("/", (req, res) => {
+  res.json({
+    name: "Meme Coin Aggregator API",
+    version: "1.0.0",
+    status: "running",
+    endpoints: {
+      health: "/health",
+      singleToken: "/api/token/:address",
+      tokenList: "/api/tokens?limit=20&sortBy=volume24hUsd&minVolume=10000",
+      search: "/api/tokens/search?q=<query>",
+    },
+    websocket: "ws://localhost:10000",
+    docs: "https://github.com/still-rollin/memeaggregator",
+  });
+});
+
 // Health route
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });

@@ -2,6 +2,17 @@
 
 A real-time data aggregation service for meme coins that fetches, merges, and caches data from multiple DEX sources with efficient caching and WebSocket support for live updates.
 
+## 🚀 Live Demo
+
+**API Base URL:** https://meme-aggregator-api.onrender.com
+
+**Try it now:**
+- Health Check: https://meme-aggregator-api.onrender.com/health
+- Token List: https://meme-aggregator-api.onrender.com/api/tokens?limit=10
+- WebSocket Demo: [Open `public/websocket-demo.html` and connect to the live URL]
+
+> **Note:** Free tier may take 30-60 seconds to wake up from sleep on first request.
+
 ## Features
 
 - **Multi-Source Data Aggregation**: Fetches token data from DexScreener, Jupiter, and GeckoTerminal APIs
