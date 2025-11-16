@@ -22,3 +22,4 @@ services:
     name: meme-aggregator-redis
     plan: free
     maxmemoryPolicy: allkeys-lru
+    ipAllowList: []  # Empty array allows internal Render services
